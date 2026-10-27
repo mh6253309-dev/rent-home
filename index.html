@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة إيجارات المحلات والشقق</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --whatsapp: #25d366;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .alert-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .alert-box i { font-size: 20px; color: var(--danger); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card.clickable {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .stat-card.clickable:hover {
+            border-color: var(--danger);
+            transform: translateY(-2px);
+        }
+
+        .stat-info h3 { font-size: 13px; color: #64748b; margin-bottom: 5px; }
+        .stat-info p { font-size: 22px; font-weight: 700; }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .controls-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-warning:hover { background: #b45309; }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { background: #1ebd59; }
+        .btn-danger-top { background: var(--danger); color: white; }
+        .btn-danger-top:hover { background: #dc2626; }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        thead th {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 14px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+        }
+
+        tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover { background: #f8fafc; }
+
+        .tenant-name-link {
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+        .tenant-name-link:hover { color: #1d4ed8; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-unpaid { background: #fee2e2; color: #991b1b; }
+        .badge-empty { background: #f3f4f6; color: #4b5563; }
+        .badge-owner { background: #e0f2fe; color: #075985; }
+
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .edit-btn { color: var(--accent); }
+        .delete-btn { color: var(--danger); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        @media print {
+            .controls-card, .action-btns, header, .btn-group, .alert-box { display: none !important; }
+            body { padding: 0; background: white; }
+            .table-container { border: none; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-building"></i> دفتر إيجارات المحلات والشقق</h1>
+        <div class="header-btns">
+            <button class="btn btn-danger-top" onclick="showUnpaidListModal()">
+                <i class="fa-solid fa-circle-exclamation"></i> لم يتم التحصيل: <span id="topUnpaidBadge" style="background:white; color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:bold;">0</span>
+            </button>
+            <button class="btn btn-whatsapp" onclick="sendGeneralWhatsAppReport()"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
+            <button class="btn btn-warning" onclick="backupData()"><i class="fa-solid fa-download"></i> حفظ الذاكرة</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> استعادة</button>
+            <input type="file" id="importFile" style="display: none;" accept=".json" onchange="restoreData(event)">
+            <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة</button>
+        </div>
+    </header>
+
+    <!-- تنبيه المتأخرين -->
+    <div id="alertContainer"></div>
+
+    <!-- كروت الإحصائيات -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3>إجمالي المبالغ المحصلة</h3>
+                <p id="totalAmount">0 ج.م</p>
+            </div>
+            <div class="stat-icon" style="background: #d1fae5; color: #10b981;">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+        </div>
+
+        <div class="stat-card clickable" onclick="showUnpaidListModal()" title="اضغط لعرض من لم يتم التحصيل منهم بالتحديد">
+            <div class="stat-info">
+                <h3>لم يتم تحصيلهم (اضغط للعرض)</h3>
+                <p id="unpaidCount" style="color: var(--danger);">0</p>
+            </div>
+            <div class="stat-icon" style="background: #fee2e2; color: #ef4444;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3>إجمالي المحلات والوحدات</h3>
+                <p id="totalUnits">0</p>
+            </div>
+            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+                <i class="fa-solid fa-store"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- البحث والتحكم -->
+    <div class="controls-card">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="بحث باسم المستأجر، الدور، أو الملاحظات...">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> إضافة بيان جديد</button>
+            <button class="btn btn-success" onclick="exportCSV()"><i class="fa-solid fa-file-excel"></i> تصدير Excel</button>
+            <button class="btn btn-secondary" onclick="renderTable()">إلغاء التصفية وعرض الكل</button>
+        </div>
+    </div>
+
+    <!-- الجدول الرئيسي -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>الاسم (اضغط للأرشيف)</th>
+                    <th>الدور / المكان</th>
+                    <th>عن شهر / فترة</th>
+                    <th>حالة التحصيل</th>
+                    <th>المبلغ</th>
+                    <th>تاريخ الدفع</th>
+                    <th>ملاحظات</th>
+                    <th class="action-btns">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="rentTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة عرض قائمة غير المحصلين -->
+<div class="modal" id="unpaidListModal">
+    <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i> أسماء الأشخاص الذين لم يتم التحصيل منهم</h3>
+            <i class="fa-solid fa-xmark" style="cursor:pointer; font-size: 18px;" onclick="closeUnpaidListModal()"></i>
+        </div>
+        <div id="unpaidListContent"></div>
+    </div>
+</div>
+
+<!-- نافذة إضافة وتحديث البيانات -->
+<div class="modal" id="dataModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">تسجيل / تحديث بيانات الإيجار</h3>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeModal()"></i>
+        </div>
+        <form id="rentForm" onsubmit="saveRecord(event)">
+            <input type="hidden" id="recordId">
+            <div class="form-group">
+                <label>الاسم (المستأجر / النشاط)</label>
+                <input type="text" id="tenantName" required>
+            </div>
+            <div class="form-group">
+                <label>الدور / المكان</label>
+                <input type="text" id="floor" placeholder="مثال: الأرضي / الدور الأول">
+            </div>
+            <div class="form-group">
+                <label>عن شهر / فترة</label>
+                <input type="text" id="rentMonth" required placeholder="مثال: أكتوبر 2026">
+            </div>
+            <div class="form-group">
+                <label>حالة التحصيل</label>
+                <select id="paymentStatus">
+                    <option value="unpaid">لم يتم التحصيل حتى الآن</option>
+                    <option value="paid">تم التحصيل</option>
+                    <option value="empty">شاغر / فاضي</option>
+                    <option value="owner">استخدام خاص</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>المبلغ (أرقام صحيحة أو عشرية فقط)</label>
+                <input type="text" id="amount" inputmode="decimal" placeholder="0" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); checkAmountStatus();">
+            </div>
+            <div class="form-group">
+                <label>تاريخ التحصيل</label>
+                <input type="date" id="rentDate" onchange="checkDateStatus()">
+            </div>
+            <div class="form-group">
+                <label>ملاحظات</label>
+                <input type="text" id="notes" placeholder="ملاحظات إضافية...">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">حفظ في الذاكرة الدائمة</button>
+        </form>
+    </div>
+</div>
+
+<!-- نافذة الأرشيف -->
+<div class="modal" id="archiveModal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 id="archiveModalTitle">أرشيف الشهور السابقة</h3>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeArchiveModal()"></i>
+        </div>
+        <div id="archiveContent"></div>
+    </div>
+</div>
+
+<script>
+    const TARGET_WHATSAPP_PHONE = "201153211261";
+
+    function getCurrentMonthName() {
+        const date = new Date();
+        return date.toLocaleString('ar-EG', { month: 'long', year: 'numeric' });
+    }
+
+    const currentMonthDefault = getCurrentMonthName();
+
+    const initialData = [
+        { id: 1, name: "كامل", floor: "المحل الأرضي", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 2, name: "سيد", floor: "الدور الأول", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 3, name: "ابو جمال", floor: "الشقة", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 4, name: "عبد الله", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 5, name: "محلات تحت", floor: "الأرضي", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 6, name: "معمل تحاليل", floor: "المحل", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "نشاط تجاري", archive: [] },
+        { id: 7, name: "فاضيه", floor: "-", month: currentMonthDefault, status: "empty", amount: 0, date: "", notes: "شاغر", archive: [] },
+        { id: 8, name: "بتاعتي", floor: "-", month: currentMonthDefault, status: "owner", amount: 0, date: "", notes: "استخدام شخصي", archive: [] },
+        { id: 9, name: "المحمدي", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 10, name: "مصطفى", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 11, name: "محمود", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 12, name: "الصعيدي", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 13, name: "ابراهيم", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 14, name: "ناصر", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 15, name: "نبيل", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 16, name: "عضمضم", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 17, name: "كريم", floor: "-", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 18, name: "رمضان ارض السلام", floor: "أرض السلام", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 19, name: "عمرو ارض القهوة", floor: "أرض القهوة", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] },
+        { id: 20, name: "فتحي البدروم", floor: "البدروم", month: currentMonthDefault, status: "unpaid", amount: 0, date: "", notes: "", archive: [] }
+    ];
+
+    let rentData = JSON.parse(localStorage.getItem('myRentDataV9')) || initialData;
+
+    function saveDataToMemory() {
+        localStorage.setItem('myRentDataV9', JSON.stringify(rentData));
+    }
+
+    // ميزة ذكية: إذا كتب المستخدم مبلغاً، يتم تحويل حالة التحصيل تلقائياً إلى "تم التحصيل" لمنع الخطأ
+    function checkAmountStatus() {
+        const amt = document.getElementById('amount').value;
+        const statusSelect = document.getElementById('paymentStatus');
+        if (parseFloat(amt) > 0) {
+            statusSelect.value = 'paid';
+        }
+    }
+
+    function checkDateStatus() {
+        const dt = document.getElementById('rentDate').value;
+        const amt = document.getElementById('amount').value;
+        const statusSelect = document.getElementById('paymentStatus');
+        if (dt && parseFloat(amt) > 0) {
+            statusSelect.value = 'paid';
+        }
+    }
+
+    function renderTable(customData = rentData) {
+        const tbody = document.getElementById('rentTableBody');
+        tbody.innerHTML = '';
+        let totalSum = 0;
+        let unpaidCount = 0;
+        let unpaidList = [];
+
+        const today = new Date();
+        const currentDay = today.getDate();
+
+        rentData.forEach((item) => {
+            const val = parseFloat(item.amount) || 0;
+            if (item.status === 'paid') totalSum += val;
+            if (item.status === 'unpaid') {
+                unpaidCount++;
+                unpaidList.push(item);
+            }
+        });
+
+        customData.forEach((item) => {
+            let badgeHtml = '';
+            if (item.status === 'paid') {
+                badgeHtml = `<span class="badge badge-paid">تم التحصيل</span>`;
+            } else if (item.status === 'unpaid') {
+                badgeHtml = `<span class="badge badge-unpaid">لم يتم التحصيل حتى الآن</span>`;
+            } else if (item.status === 'empty' || item.name.includes("فاضيه")) {
+                badgeHtml = `<span class="badge badge-empty">فاضية / شاغر</span>`;
+            } else if (item.status === 'owner' || item.name.includes("بتاعتي")) {
+                badgeHtml = `<span class="badge badge-owner">خاصة</span>`;
+            }
+
+            const val = parseFloat(item.amount) || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <span class="tenant-name-link" onclick="openArchive(${item.id})" title="اضغط لعرض الأرشيف">${item.name}</span>
+                </td>
+                <td>${item.floor || '-'}</td>
+                <td><strong>${item.month || currentMonthDefault}</strong></td>
+                <td>${badgeHtml}</td>
+                <td><strong>${val > 0 ? val.toLocaleString() + ' ج.م' : '-'}</strong></td>
+                <td>${item.date || '-'}</td>
+                <td>${item.notes || '-'}</td>
+                <td class="action-btns">
+                    <button class="action-btn edit-btn" onclick="editRecord(${item.id})" title="تحديث / تحصيل"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="action-btn delete-btn" onclick="deleteRecord(${item.id})" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const alertContainer = document.getElementById('alertContainer');
+        const unpaidNamesStr = unpaidList.map(u => u.name).join('، ');
+        if (currentDay >= 1 && currentDay <= 10 && unpaidList.length > 0) {
+            alertContainer.innerHTML = `
+                <div class="alert-box">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>تنبيه فترة التحصيل (من 1 إلى 10):</strong> لم يتم التحصيل من: 
+                        <span style="font-weight:700;">${unpaidNamesStr}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            alertContainer.innerHTML = '';
+        }
+
+        document.getElementById('totalAmount').innerText = totalSum.toLocaleString() + ' ج.م';
+        document.getElementById('unpaidCount').innerText = unpaidCount;
+        document.getElementById('topUnpaidBadge').innerText = unpaidCount;
+        document.getElementById('totalUnits').innerText = rentData.length;
+
+        saveDataToMemory();
+    }
+
+    function showUnpaidListModal() {
+        const unpaidItems = rentData.filter(r => r.status === 'unpaid');
+        const modalContent = document.getElementById('unpaidListContent');
+
+        if (unpaidItems.length === 0) {
+            modalContent.innerHTML = `<p style="text-align:center; padding:20px; color:var(--success); font-weight:bold; font-size:16px;">رائع! تم تحصيل الإيجار من الجميع ولا يوجد متأخرين.</p>`;
+        } else {
+            let html = `<p style="margin-bottom:15px; color:#64748b;">إجمالي عدد غير المحصلين حتى الآن: <strong>${unpaidItems.length}</strong> مستأجر</p>`;
+            html += `<table style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background:#f1f5f9;">
+                                <th style="padding:10px; border:1px solid #ddd;">اسم المستأجر</th>
+                                <th style="padding:10px; border:1px solid #ddd;">الدور / المكان</th>
+                                <th style="padding:10px; border:1px solid #ddd;">الفترة</th>
+                                <th style="padding:10px; border:1px solid #ddd;">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            unpaidItems.forEach(u => {
+                html += `<tr>
+                            <td style="padding:10px; border:1px solid #ddd; font-weight:bold;">${u.name}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">${u.floor || '-'}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">${u.month || currentMonthDefault}</td>
+                            <td style="padding:10px; border:1px solid #ddd; text-align:center;">
+                                <button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="closeUnpaidListModal(); editRecord(${u.id})">تحصيل الآن</button>
+                            </td>
+                         </tr>`;
+            });
+            html += `</tbody></table>`;
+            modalContent.innerHTML = html;
+        }
+
+        document.getElementById('unpaidListModal').style.display = 'flex';
+    }
+
+    function closeUnpaidListModal() {
+        document.getElementById('unpaidListModal').style.display = 'none';
+    }
+
+    function sendGeneralWhatsAppReport() {
+        let total = document.getElementById('totalAmount').innerText;
+        let unpaid = document.getElementById('unpaidCount').innerText;
+        
+        let msg = `📋 *التقرير العام لإيجارات المحلات والشقق*\n\n` +
+                  `💰 إجمالي المحصل: ${total}\n` +
+                  `⚠️ لم يتم تحصيلهم: ${unpaid} مستأجر\n\n` +
+                  `---------------------------\n`;
+
+        rentData.forEach(r => {
+            let st = r.status === 'paid' ? `(${r.amount} ج.م)` : '(لم يدفع)';
+            if(r.status === 'paid' || r.status === 'unpaid') {
+                msg += `• ${r.name}: ${st}\n`;
+            }
+        });
+
+        window.open(`https://wa.me/${TARGET_WHATSAPP_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function openArchive(id) {
+        const item = rentData.find(r => r.id === id);
+        if (!item) return;
+
+        document.getElementById('archiveModalTitle').innerText = `أرشيف الشهور السابقة: ${item.name}`;
+        const archiveContent = document.getElementById('archiveContent');
+
+        let currentStatusTxt = item.status === 'paid' ? `تم تحصيل ${item.amount} ج.م` : 'لم يتم التحصيل حتى الآن';
+        let html = `
+            <div style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom: 15px; border:1px solid #e2e8f0;">
+                <div><strong>الحالة الحالية:</strong> ${currentStatusTxt}</div>
+                <div><strong>الفترة الحالية:</strong> ${item.month || currentMonthDefault}</div>
+            </div>
+            <h4 style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">سجل المدفوعات والشهور المسجلة سابقاً:</h4>
+        `;
+
+        if (!item.archive || item.archive.length === 0) {
+            html += `<p style="color: #64748b; padding: 15px 0;">لا يوجد أرشفة لشهور سابقة حتى الآن.</p>`;
+        } else {
+            html += `<table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="background:#f1f5f9;">
+                                <th style="padding:8px; border:1px solid #ddd;">الشهر / الفترة</th>
+                                <th style="padding:8px; border:1px solid #ddd;">المبلغ</th>
+                                <th style="padding:8px; border:1px solid #ddd;">تاريخ الدفع</th>
+                                <th style="padding:8px; border:1px solid #ddd;">ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            item.archive.forEach(arch => {
+                html += `<tr>
+                            <td style="padding:8px; border:1px solid #ddd;"><strong>${arch.month || '-'}</strong></td>
+                            <td style="padding:8px; border:1px solid #ddd;">${arch.amount || 0} ج.م</td>
+                            <td style="padding:8px; border:1px solid #ddd;">${arch.date || '-'}</td>
+                            <td style="padding:8px; border:1px solid #ddd;">${arch.notes || '-'}</td>
+                         </tr>`;
+            });
+            html += `</tbody></table>`;
+        }
+
+        archiveContent.innerHTML = html;
+        document.getElementById('archiveModal').style.display = 'flex';
+    }
+
+    function closeArchiveModal() {
+        document.getElementById('archiveModal').style.display = 'none';
+    }
+
+    function openModal(editId = null) {
+        document.getElementById('rentForm').reset();
+        document.getElementById('recordId').value = '';
+        document.getElementById('modalTitle').innerText = 'تسجيل / تحديث بيانات الإيجار';
+        document.getElementById('rentMonth').value = getCurrentMonthName();
+
+        if (editId) {
+            const record = rentData.find(r => r.id === editId);
+            if (record) {
+                document.getElementById('recordId').value = record.id;
+                document.getElementById('tenantName').value = record.name;
+                document.getElementById('floor').value = record.floor;
+                document.getElementById('rentMonth').value = record.month || getCurrentMonthName();
+                document.getElementById('paymentStatus').value = record.status || 'unpaid';
+                document.getElementById('amount').value = record.amount || '';
+                document.getElementById('rentDate').value = record.date || '';
+                document.getElementById('notes').value = record.notes || '';
+            }
+        }
+        document.getElementById('dataModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('dataModal').style.display = 'none';
+    }
+
+    function saveRecord(e) {
+        e.preventDefault();
+        const id = document.getElementById('recordId').value;
+        const name = document.getElementById('tenantName').value;
+        const floor = document.getElementById('floor').value;
+        const month = document.getElementById('rentMonth').value;
+        const status = document.getElementById('paymentStatus').value;
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const date = document.getElementById('rentDate').value;
+        const notes = document.getElementById('notes').value;
+
+        if (id) {
+            const index = rentData.findIndex(r => r.id == id);
+            if (index !== -1) {
+                const oldItem = rentData[index];
+                if (oldItem.month && oldItem.month !== month && oldItem.status === 'paid') {
+                    if (!oldItem.archive) oldItem.archive = [];
+                    oldItem.archive.push({
+                        month: oldItem.month,
+                        amount: oldItem.amount,
+                        date: oldItem.date,
+                        notes: oldItem.notes
+                    });
+                }
+                rentData[index] = { ...oldItem, id: parseInt(id), name, floor, month, status, amount, date, notes };
+            }
+        } else {
+            const newId = rentData.length ? Math.max(...rentData.map(r => r.id)) + 1 : 1;
+            rentData.push({ id: newId, name, floor, month, status, amount, date, notes, archive: [] });
+        }
+
+        renderTable();
+        closeModal();
+    }
+
+    function editRecord(id) { openModal(id); }
+
+    function deleteRecord(id) {
+        if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+            rentData = rentData.filter(r => r.id !== id);
+            renderTable();
+        }
+    }
+
+    function backupData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rentData));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", "rent_memory_backup.json");
+        dlAnchorElem.click();
+    }
+
+    function restoreData(event) {
+        const fileReader = new FileReader();
+        if (event.target.files[0]) {
+            fileReader.readAsText(event.target.files[0], "UTF-8");
+            fileReader.onload = function (e) {
+                try {
+                    rentData = JSON.parse(e.target.result);
+                    renderTable();
+                    alert("تم استعادة الذاكرة والبيانات بنجاح!");
+                } catch (err) {
+                    alert("ملف غير صالح!");
+                }
+            }
+        }
+    }
+
+    function filterTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#rentTableBody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+
+    function exportCSV() {
+        let csv = '\uFEFFالاسم,الدور,عن شهر,الحالة,المبلغ,تاريخ التحصيل,ملاحظات\n';
+        rentData.forEach(r => {
+            csv += `"${r.name}","${r.floor || ''}","${r.month || ''}","${r.status}","${r.amount || 0}","${r.date || ''}","${r.notes || ''}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'دفتر_الايجارات.csv';
+        link.click();
+    }
+
+    renderTable();
+</script>
+</body>
+</html>
